@@ -75,10 +75,8 @@ fun NavGraph(
                         onItemSelected = { id ->
                             if (listViewModel.state.value.dataList.find { it.id == id } != null
                                 && selectedId != id) {
+                                selectedId = id
                                 listViewModel.sendIntent(RandomCitiesIntent.SelectItem(id))
-                                /*selectedId = id
-
-                                listViewModel.sendIntent(RandomCitiesIntent.SelectItem(id))*/
                                 val city = state.dataList.find { it.id == id }
                                 city?.let {
                                     onTitleChange(it.cityName) // Update title here
