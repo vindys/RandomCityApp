@@ -21,18 +21,17 @@ import com.example.randomcityapp.domain.worker.scheduleToastForCity
 import com.example.randomcityapp.intent.RandomCitiesIntent
 import com.example.randomcityapp.view.detail.CityDetailsScreen
 import com.example.randomcityapp.view.list.CitiesListScreen
-import com.example.randomcityapp.view.main.CitiesListViewModel
+import com.example.randomcityapp.view.viewmodel.CitiesListViewModel
 import kotlinx.coroutines.flow.map
 
 @Composable
 fun NavGraph(
     navController: NavHostController,
-    onBack: () -> Unit
+    twoPane: Boolean,
+    onBack: () -> Unit,
+    onTitleChange: (String) -> Unit
 ) {
     val listViewModel: CitiesListViewModel = hiltViewModel()
-    val tablet = isTablet()
-    val landscape = isLandscape()
-    val twoPane = tablet && landscape
     var selectedId by remember { mutableStateOf<Int?>(null) }
     val selectedItem by listViewModel.state
         .map { it.selectedItem }
@@ -40,34 +39,42 @@ fun NavGraph(
     val currentBackStackEntry = navController.currentBackStackEntryAsState()
 
     val isInDetails = currentBackStackEntry.value?.destination?.route?.startsWith("details") == true
+    val state by listViewModel.state.collectAsState()
 
     LaunchedEffect(twoPane, isInDetails) {
         if (twoPane && isInDetails) {
-            // Two-pane mode should show both list and details in one screen
+            // Entering two-pane mode: go back to main to show list + details
             navController.navigate("main") {
                 popUpTo("details") { inclusive = true }
             }
-        } else if (!twoPane && !isInDetails && selectedId != null) {
-            // Switch to single-pane details if needed
-            navController.navigate("details/$selectedId")
+        } else if (!twoPane) {
+            if (selectedItem != null && !isInDetails) {
+                // In single-pane and a city is selected: navigate to details
+                navController.navigate("details/${selectedItem!!.id}")
+            } else if (selectedItem == null && isInDetails) {
+                // No item selected but still in details screen, go back or clear state
+                listViewModel.clearSelection()
+                navController.popBackStack()
+            }
         }
     }
     NavHost(navController = navController, startDestination = "main") {
         composable("main") {
-            val state by listViewModel.state.collectAsState()
             if (twoPane) {
                 Row(Modifier.fillMaxSize()) {
                     CitiesListScreen(
                         modifier = Modifier
-                            .weight(1f)         // This makes it fill 50% of width
-                            .fillMaxHeight(),    // Fill height inside Row
+                            .weight(1f)
+                            .fillMaxHeight(),
                         onItemSelected = { id, context ->
-                            if (listViewModel.state.value.dataList.find { it.id == id } != null && selectedId != id) {
+                            if (listViewModel.state.value.dataList.find { it.id == id } != null
+                                && selectedId != id) {
+                                selectedId = id
                                 listViewModel.selectCity(id)
                                 listViewModel.sendIntent(RandomCitiesIntent.SelectItem(id))
-                                selectedId = id
                                 val city = state.dataList.find { it.id == id }
                                 city?.let {
+                                    onTitleChange(it.cityName) // Update title here
                                     scheduleToastForCity(context, it.cityName)
                                 }
                             }
@@ -77,9 +84,7 @@ fun NavGraph(
                         city = selectedItem,
                         modifier = Modifier
                             .weight(1f)         // Fill other half
-                            .fillMaxHeight(),
-                        onBack = onBack,
-                        showBack = false
+                            .fillMaxHeight()
                     )
                 }
             } else {
@@ -91,21 +96,27 @@ fun NavGraph(
                         navController.navigate("details/$id")
                         val city = state.dataList.find { it.id == id }
                         city?.let {
+                            onTitleChange(it.cityName)
                             scheduleToastForCity(context, it.cityName)
                         }
                     }
                 )
             }
         }
+
         composable("details/{cityId}") { backStackEntry ->
             val cityId = backStackEntry.arguments?.getString("cityId")?.toIntOrNull()
             if (cityId != null) {
+                backStackEntry.arguments?.getString("cityId")?.toIntOrNull()
+
+                LaunchedEffect(selectedItem) {
+                    selectedItem?.let {
+                        onTitleChange(it.cityName)
+                    }
+                }
                 CityDetailsScreen(
                     city = selectedItem,
-                    modifier = Modifier.fillMaxSize(),
-                    onBack = {
-                        navController.popBackStack()
-                    }
+                    modifier = Modifier.fillMaxSize()
                 )
             }
         }

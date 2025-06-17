@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,7 +8,9 @@ plugins {
     id("com.google.devtools.ksp")
     id ("com.google.dagger.hilt.android") // Apply the plugin
 }
-
+val secretsProperties = Properties().apply {
+    load(File(rootDir, "local.properties").inputStream())
+}
 android {
     namespace = "com.example.randomcityapp"
     compileSdk = 35
@@ -18,6 +22,9 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+        defaultConfig {
+            resValue("string", "google_maps_key", secretsProperties["MAPS_API_KEY"] as String)
+        }
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true

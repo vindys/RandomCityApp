@@ -1,4 +1,4 @@
-package com.example.randomcityapp.view.main
+package com.example.randomcityapp.view.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.Lifecycle

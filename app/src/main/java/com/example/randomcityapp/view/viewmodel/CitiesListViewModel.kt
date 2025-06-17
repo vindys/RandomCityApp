@@ -1,4 +1,4 @@
-package com.example.randomcityapp.view.main
+package com.example.randomcityapp.view.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -63,6 +63,8 @@ class CitiesListViewModel @Inject constructor(
         }
     }
 
-
+    fun clearSelection() {
+        _state.update { it.copy(selectedItem = null) }
+    }
 
 }
