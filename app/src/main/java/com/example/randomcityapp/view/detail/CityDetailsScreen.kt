@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -30,6 +31,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.randomcityapp.model.source.local.RandomCity
 import com.example.randomcityapp.view.common.theme.contrastingTextColor
 import com.example.randomcityapp.view.common.theme.toColorOrDefault
+import com.example.randomcityapp.view.main.CityDetailsViewModel
 import com.example.randomcityapp.view.main.MainViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -43,13 +45,14 @@ import com.google.maps.android.compose.rememberCameraPositionState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CityDetailsScreen(
+    city: RandomCity?,
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel = hiltViewModel(),
     onBack: () -> Unit,
     showBack: Boolean = true
 ) {
-    val cityState by viewModel.selectedItem.collectAsState()
-    val city = cityState
+    val viewModel: CityDetailsViewModel = hiltViewModel()
+
+
 
     if (city == null) {
         Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -80,7 +83,7 @@ fun CityDetailsScreen(
                     if (showBack) {
                         IconButton(onClick = onBack) {
                             Icon(
-                                Icons.Default.ArrowBack,
+                                Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back",
                                 tint = city.color.toColorOrDefault().contrastingTextColor()
                             )
@@ -113,7 +116,6 @@ fun CityMapSection(city: RandomCity) {
         )
     }
 
-    // 🔄 Re-focus map camera when city changes
     LaunchedEffect(city.lat, city.lng) {
         cameraPositionState.animate(
             CameraUpdateFactory.newLatLngZoom(

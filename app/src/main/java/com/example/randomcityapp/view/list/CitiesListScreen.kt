@@ -22,25 +22,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.randomcityapp.intent.RandomCitiesIntent
 import com.example.randomcityapp.view.common.theme.toColorOrDefault
 import com.example.randomcityapp.view.common.theme.toFormattedDateTime
+import com.example.randomcityapp.view.main.CitiesListViewModel
 import com.example.randomcityapp.view.main.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CitiesListScreen(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel,
     onItemSelected: (Int, Context) -> Unit
 
 ) {
+    val viewModel: CitiesListViewModel = hiltViewModel()
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     val selectedCity = state.selectedItem
-    LaunchedEffect(Unit) {
-        viewModel.sendIntent(RandomCitiesIntent.LoadAll)
-    }
 
     Scaffold(
         modifier = modifier,

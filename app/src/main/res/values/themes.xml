@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="Theme.RandomCityApp.Splash" parent="Theme.SplashScreen">
+        <!-- Background color -->
+        <item name="windowSplashScreenBackground">@color/white</item>
+
+        <!-- Icon shown in center (animated if available) -->
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+
+        <!-- App theme to switch to after splash -->
+        <item name="postSplashScreenTheme">@style/Theme.RandomCityApp</item>
+    </style>
 
     <style name="Theme.RandomCityApp" parent="android:Theme.Material.Light.NoActionBar" />
 </resources>

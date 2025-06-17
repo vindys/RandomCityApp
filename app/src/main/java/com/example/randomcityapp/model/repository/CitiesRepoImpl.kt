@@ -1,5 +1,6 @@
 package com.example.randomcityapp.model.repository
 
+import android.util.Log
 import com.example.randomcityapp.model.source.local.RandomCity
 import com.example.randomcityapp.model.source.local.RandomCityDao
 import kotlinx.coroutines.flow.Flow
@@ -9,11 +10,13 @@ import javax.inject.Singleton
 @Singleton
 class CitiesRepoImpl @Inject constructor(private val randomCityDao:
                                          RandomCityDao) : CitiesRepository {
+    val TAG = "CitiesRepoImpl"
     override suspend fun insert(randomCity: RandomCity) {
         randomCityDao.insert(randomCity)
     }
 
     override suspend fun delete(randomCity: RandomCity) {
+        Log.d(TAG, "delete: ${randomCity.cityName}")
         randomCityDao.delete(randomCity)
     }
 

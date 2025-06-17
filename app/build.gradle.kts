@@ -101,6 +101,18 @@ dependencies {
     ksp(libs.room.compiler)
     implementation(libs.room.ktx)
 
+    //navigation
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.hilt.navigation.compose)
+    //map
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.maps)
+    //workmanager
+    implementation(libs.androidx.work.runtime.ktx)
+    //splashscreen api
+    implementation(libs.androidx.core.splashscreen)
+
+
     // Test & Debug
     testImplementation(libs.junit)
     testImplementation(libs.dagger.hilt.testing)
@@ -114,7 +126,6 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test.v173)
     //turbine for testing states in mvi
     testImplementation(libs.turbine) // for testing Flows
-
 
     // Room
     testImplementation(libs.room.testing)
@@ -131,27 +142,5 @@ dependencies {
     //kaptAndroidTest(libs.dagger.hilt.compiler)
     kaptAndroidTest(libs.dagger.hilt.android.compiler)
     kaptTest(libs.dagger.hilt.compiler)
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.hilt.navigation.compose)
-    implementation(libs.maps.compose)
-    implementation(libs.play.services.maps)
-    implementation(libs.androidx.work.runtime.ktx)
     testImplementation(kotlin("test"))
-
-
 }
-
-//class RoomSchemaArgProvider(
-//    @get:InputDirectory
-//    @get:PathSensitive(PathSensitivity.RELATIVE)
-//    val schemaDir: File
-//) : CommandLineArgumentProvider {
-//
-//    override fun asArguments(): Iterable<String> {
-//        return listOf("room.schemaLocation=${schemaDir.path}")
-//    }
-//}
-//
-//ksp {
-//    arg(RoomSchemaArgProvider(File(projectDir, "schemas")))
-//}
