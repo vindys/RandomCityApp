@@ -1,7 +1,10 @@
 package com.example.randomcityapp.intent
 
+import com.example.randomcityapp.model.source.local.RandomCity
+
 sealed class RandomCitiesIntent {
-    object LoadAll : RandomCitiesIntent() // todo do we need to make it generic type if multiple type responses comes
+    object LoadAll : RandomCitiesIntent()
+    data class insert(val randomCity: RandomCity) : RandomCitiesIntent()
     data class SelectItem(val id: Int) : RandomCitiesIntent()
     object ResetDb : RandomCitiesIntent()
     //todo add a deselection intent

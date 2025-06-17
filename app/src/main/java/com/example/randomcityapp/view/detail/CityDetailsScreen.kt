@@ -1,5 +1,6 @@
 package com.example.randomcityapp.view.detail
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -15,9 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.randomcityapp.model.source.local.RandomCity
-import com.example.randomcityapp.view.viewmodel.CityDetailsViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -31,8 +30,12 @@ import com.google.maps.android.compose.rememberCameraPositionState
 @Composable
 fun CityDetailsScreen(
     city: RandomCity?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onBack: () -> Unit
 ) {
+    BackHandler {
+        onBack() // Will call navController.popBackStack() from NavGraph
+    }
     if (city == null) {
         Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text("No city selected")

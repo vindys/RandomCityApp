@@ -69,9 +69,10 @@ fun NavGraph(
                         onItemSelected = { id, context ->
                             if (listViewModel.state.value.dataList.find { it.id == id } != null
                                 && selectedId != id) {
-                                selectedId = id
-                                listViewModel.selectCity(id)
                                 listViewModel.sendIntent(RandomCitiesIntent.SelectItem(id))
+                                /*selectedId = id
+
+                                listViewModel.sendIntent(RandomCitiesIntent.SelectItem(id))*/
                                 val city = state.dataList.find { it.id == id }
                                 city?.let {
                                     onTitleChange(it.cityName) // Update title here
@@ -84,7 +85,8 @@ fun NavGraph(
                         city = selectedItem,
                         modifier = Modifier
                             .weight(1f)         // Fill other half
-                            .fillMaxHeight()
+                            .fillMaxHeight(),
+                        onBack
                     )
                 }
             } else {
@@ -92,7 +94,7 @@ fun NavGraph(
                 CitiesListScreen(
                     modifier = Modifier.fillMaxSize(),
                     onItemSelected = { id, context ->
-                        listViewModel.selectCity(id)
+                        listViewModel.sendIntent(RandomCitiesIntent.SelectItem(id))
                         navController.navigate("details/$id")
                         val city = state.dataList.find { it.id == id }
                         city?.let {
@@ -116,7 +118,8 @@ fun NavGraph(
                 }
                 CityDetailsScreen(
                     city = selectedItem,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    onBack
                 )
             }
         }

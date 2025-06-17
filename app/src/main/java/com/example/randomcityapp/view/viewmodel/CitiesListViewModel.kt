@@ -7,9 +7,12 @@ import com.example.randomcityapp.intent.RandomCitiesIntent
 import com.example.randomcityapp.intent.RandomCitiesIntent.LoadAll
 import com.example.randomcityapp.model.repository.CitiesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -22,18 +25,33 @@ class CitiesListViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(CitiesState())
     val state: StateFlow<CitiesState> = _state.asStateFlow()
-    /*private val _selectedCityId = MutableStateFlow<Int?>(null)
-    val selectedCityId: StateFlow<Int?> = _selectedCityId.asStateFlow()*/
+
+    private val intentChannel = Channel<RandomCitiesIntent>(Channel.UNLIMITED)
 
     init {
+        processIntents()
         sendIntent(LoadAll)
     }
 
     fun sendIntent(intent: RandomCitiesIntent) {
-        when (intent) {
-            is LoadAll -> observeAllData()
-            is RandomCitiesIntent.SelectItem -> selectCity(intent.id)
-            else -> {}
+        intentChannel.trySend(intent).isSuccess // Optional: check result
+    }
+
+    private fun processIntents() {
+        viewModelScope.launch {
+            intentChannel.consumeAsFlow().collect { intent ->
+                when (intent) {
+                    is LoadAll -> observeAllData()
+                    is RandomCitiesIntent.SelectItem -> selectCity(intent.id)
+                    is RandomCitiesIntent.ResetDb -> launch(Dispatchers.IO) {
+                        repository.resetDb()
+                    }
+
+                    is RandomCitiesIntent.insert -> launch(Dispatchers.IO) {
+                        repository.insert(intent.randomCity)
+                    }
+                }
+            }
         }
     }
 
@@ -47,7 +65,7 @@ class CitiesListViewModel @Inject constructor(
         }
     }
 
-    fun selectCity(id: Int) {
+    private fun selectCity(id: Int) {
 
         val currentState = state.value
         val cityInList = currentState.dataList.find { it.id == id }

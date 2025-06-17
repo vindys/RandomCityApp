@@ -16,7 +16,6 @@ class CitiesRepoImpl @Inject constructor(private val randomCityDao:
     }
 
     override suspend fun delete(randomCity: RandomCity) {
-        Log.d(TAG, "delete: ${randomCity.cityName}")
         randomCityDao.delete(randomCity)
     }
 

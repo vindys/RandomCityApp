@@ -8,6 +8,9 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,25 +22,25 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.randomcityapp.intent.RandomCitiesIntent
 import com.example.randomcityapp.view.common.MainScreen
 import com.example.randomcityapp.view.common.theme.RandomCityAppTheme
 import com.example.randomcityapp.view.common.theme.contrastingTextColor
 import com.example.randomcityapp.view.common.theme.toColorOrDefault
-import com.example.randomcityapp.view.viewmodel.CitiesListViewModel
-import com.example.randomcityapp.view.viewmodel.MainViewModel
 import com.example.randomcityapp.view.navigation.isLandscape
 import com.example.randomcityapp.view.navigation.isTablet
+import com.example.randomcityapp.view.viewmodel.CitiesListViewModel
+import com.example.randomcityapp.view.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -54,11 +57,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
-        lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.startGenerator(this@MainActivity)
-            }
-        }
+        // Start flow collection in lifecycle-aware manner
+        viewModel.startGenerator(this)
 
         setContent {
             RandomCityAppTheme {
@@ -86,6 +86,7 @@ fun AppScaffold(navController: NavHostController) {
     val backgroundColor = cityState.selectedItem?.color
         ?.toColorOrDefault(MaterialTheme.colorScheme.primary)
         ?: MaterialTheme.colorScheme.primary
+    var menuExpanded by remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -110,6 +111,25 @@ fun AppScaffold(navController: NavHostController) {
                                 tint = backgroundColor.contrastingTextColor()
                             )
                         }
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { menuExpanded = true }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = "Menu")
+                    }
+
+                    DropdownMenu(
+                        expanded = menuExpanded,
+                        onDismissRequest = { menuExpanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Reset DB") },
+                            onClick = {
+                                menuExpanded = false
+                                citiesListViewModel.sendIntent(RandomCitiesIntent.ResetDb)
+                            }
+                        )
+                        // Add more menu items here if needed
                     }
                 }
             )
