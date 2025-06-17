@@ -5,7 +5,9 @@ package com.example.randomcityapp
 import com.example.randomcityapp.model.repository.CitiesRepoImpl
 import com.example.randomcityapp.model.source.local.RandomCity
 import com.example.randomcityapp.model.source.local.RandomCityDao
-import io.mockk.*
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -40,7 +42,8 @@ class CitiesRepoImplTest {
 
     @Test
     fun `getCityById should return city flow from dao`() = runTest {
-        val city = RandomCity(cityName = "City", color = "Red", time = 123L, lat = 0.0, lng = 0.0, id = 1)
+        val city =
+            RandomCity(cityName = "City", color = "Red", time = 123L, lat = 0.0, lng = 0.0, id = 1)
         every { dao.getCitiesById(1) } returns flowOf(city)
 
         val result = repository.getCityById(1)

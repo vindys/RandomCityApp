@@ -8,21 +8,18 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import kotlin.test.assertNotNull
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RandomCityProducerTest {
@@ -31,8 +28,10 @@ class RandomCityProducerTest {
     private lateinit var producer: RandomCityProducer
     private val fakeGeocodingService = mockk<GeocodingService>()
 
-    private val cityNames = listOf("New York", "Los Angeles", "Scranton", "Philadelphia",
-        "Nashville", "Saint Louis", "Miami","TestCity")
+    private val cityNames = listOf(
+        "New York", "Los Angeles", "Scranton", "Philadelphia",
+        "Nashville", "Saint Louis", "Miami", "TestCity"
+    )
     private val colors = listOf("Yellow", "White", "Green", "Blue", "Red", "Black")
 
     @Before

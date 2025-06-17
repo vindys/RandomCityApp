@@ -79,10 +79,4 @@ class MainViewModel @Inject constructor(
             }
         }
     }
-
-    fun resetDb() {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.resetDb()
-        }
-    }
 }
