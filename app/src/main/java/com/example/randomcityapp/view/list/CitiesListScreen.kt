@@ -1,6 +1,5 @@
 package com.example.randomcityapp.view.list
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -12,29 +11,24 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.randomcityapp.intent.CitiesState
+import com.example.randomcityapp.model.source.local.RandomCity
+import com.example.randomcityapp.view.common.theme.RandomCityAppTheme
 import com.example.randomcityapp.view.common.theme.toColorOrDefault
 import com.example.randomcityapp.view.common.theme.toFormattedDateTime
-import com.example.randomcityapp.view.viewmodel.CitiesListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CitiesListScreen(
     modifier: Modifier = Modifier,
-    onItemSelected: (Int, Context) -> Unit
-
+    state: CitiesState,
+    onItemSelected: (Int) -> Unit
 ) {
-    val viewModel: CitiesListViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsState()
-    val context = LocalContext.current
     val selectedCity = state.selectedItem
-
 
     LazyColumn(
         modifier = modifier.padding(horizontal = 8.dp)
@@ -50,7 +44,7 @@ fun CitiesListScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
-                    .clickable { onItemSelected(city.id, context) }
+                    .clickable { onItemSelected(city.id) }
                     .background(backgroundColor)
             ) {
                 Text(
@@ -67,3 +61,47 @@ fun CitiesListScreen(
         }
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewCitiesListScreen() {
+    val sampleCities = listOf(
+        RandomCity(
+            id = 1,
+            cityName = "New York",
+            color = "YELLOW",
+            time = System.currentTimeMillis(),
+            lat = 0.0,
+            lng = 0.0
+        ),
+        RandomCity(
+            id = 2,
+            cityName = "Tokyo",
+            color = "#33C1FF",
+            time = System.currentTimeMillis(),
+            lat = 0.0,
+            lng = 0.0
+        ),
+        RandomCity(
+            id = 3,
+            cityName = "Berlin",
+            color = "RED",
+            time = System.currentTimeMillis(),
+            lat = 0.0,
+            lng = 0.0
+        ),
+    )
+
+    val previewState = CitiesState(
+        dataList = sampleCities,
+        selectedItem = sampleCities[1]
+    )
+
+    RandomCityAppTheme {
+        CitiesListScreen(
+            state = previewState,
+            onItemSelected = {} // No-op for preview
+        )
+    }
+}
+
