@@ -1,5 +1,6 @@
 package com.example.randomcityapp.view.navigation
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,13 +13,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.randomcityapp.domain.worker.scheduleToastForCity
+import com.example.randomcityapp.intent.CitiesState
 import com.example.randomcityapp.intent.RandomCitiesIntent
+import com.example.randomcityapp.model.source.local.RandomCity
 import com.example.randomcityapp.view.detail.CityDetailsScreen
 import com.example.randomcityapp.view.list.CitiesListScreen
 import com.example.randomcityapp.view.viewmodel.CitiesListViewModel
@@ -40,6 +45,7 @@ fun NavGraph(
 
     val isInDetails = currentBackStackEntry.value?.destination?.route?.startsWith("details") == true
     val state by listViewModel.state.collectAsState()
+    val context = LocalContext.current
 
     LaunchedEffect(twoPane, isInDetails) {
         if (twoPane && isInDetails) {
@@ -66,7 +72,7 @@ fun NavGraph(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight(),
-                        onItemSelected = { id, context ->
+                        onItemSelected = { id ->
                             if (listViewModel.state.value.dataList.find { it.id == id } != null
                                 && selectedId != id) {
                                 listViewModel.sendIntent(RandomCitiesIntent.SelectItem(id))
@@ -79,7 +85,8 @@ fun NavGraph(
                                     scheduleToastForCity(context, it.cityName)
                                 }
                             }
-                        }
+                        },
+                        state = state
                     )
                     CityDetailsScreen(
                         city = selectedItem,
@@ -93,7 +100,7 @@ fun NavGraph(
                 // Single-pane UI shows only list, navigate to details via routes
                 CitiesListScreen(
                     modifier = Modifier.fillMaxSize(),
-                    onItemSelected = { id, context ->
+                    onItemSelected = { id ->
                         listViewModel.sendIntent(RandomCitiesIntent.SelectItem(id))
                         navController.navigate("details/$id")
                         val city = state.dataList.find { it.id == id }
@@ -101,7 +108,8 @@ fun NavGraph(
                             onTitleChange(it.cityName)
                             scheduleToastForCity(context, it.cityName)
                         }
-                    }
+                    },
+                    state = state
                 )
             }
         }
@@ -136,5 +144,60 @@ fun isTablet(): Boolean {
 @Composable
 fun isLandscape(): Boolean {
     val configuration = LocalConfiguration.current
-    return configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    return configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 }
+
+@Composable
+fun CitiesTwoPaneContent(
+    state: CitiesState,
+    selectedItem: RandomCity?,
+    onItemSelected: (Int) -> Unit,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(modifier.fillMaxSize()) {
+        CitiesListScreen(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
+            onItemSelected = { id -> onItemSelected(id) },
+            state = state
+        )
+        CityDetailsScreen(
+            city = selectedItem,
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
+            onBack = onBack
+        )
+    }
+}
+
+@Preview(showBackground = true, widthDp = 800, heightDp = 400)
+@Composable
+fun PreviewCitiesTwoPaneContent() {
+    val sampleCity = RandomCity(
+        id = 1,
+        cityName = "Sample City",
+        color = "#2196F3",
+        time = System.currentTimeMillis(),
+        lat = 0.0,
+        lng = 0.0
+    )
+
+    val fakeState = CitiesState(
+        dataList = listOf(
+            sampleCity,
+            sampleCity.copy(id = 2, cityName = "Another City")
+        ),
+        selectedItem = sampleCity
+    )
+
+    CitiesTwoPaneContent(
+        state = fakeState,
+        selectedItem = sampleCity,
+        onItemSelected = {},
+        onBack = {}
+    )
+}
+
