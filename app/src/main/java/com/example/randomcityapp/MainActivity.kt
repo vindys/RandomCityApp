@@ -32,6 +32,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.randomcityapp.intent.RandomCitiesIntent
+import com.example.randomcityapp.view.common.AppScaffold
 import com.example.randomcityapp.view.common.MainScreen
 import com.example.randomcityapp.view.common.theme.RandomCityAppTheme
 import com.example.randomcityapp.view.common.theme.contrastingTextColor
@@ -70,84 +71,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AppScaffold(navController: NavHostController) {
-    val citiesListViewModel: CitiesListViewModel = hiltViewModel()
-    val cityState by citiesListViewModel.state.collectAsState()
-    val isTwoPane = isTablet() && isLandscape()
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
-    val showBack = !isTwoPane && currentRoute?.startsWith("details") == true
-    val toolbarTitle = when {
-        cityState.selectedItem != null -> cityState.selectedItem?.cityName ?: "City Details"
-        else -> "Random Cities"
-    }
-    val backgroundColor = cityState.selectedItem?.color
-        ?.toColorOrDefault(MaterialTheme.colorScheme.primary)
-        ?: MaterialTheme.colorScheme.primary
-    var menuExpanded by remember { mutableStateOf(false) }
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        toolbarTitle,
-                        color = backgroundColor.contrastingTextColor()
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    backgroundColor
-                ),
-                navigationIcon = {
-                    if (showBack) {
-                        IconButton(onClick = {
-                            citiesListViewModel.clearSelection()
-                            navController.popBackStack()
-                        }) {
-                            Icon(
-                                Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back",
-                                tint = backgroundColor.contrastingTextColor()
-                            )
-                        }
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { menuExpanded = true }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "Menu")
-                    }
 
-                    DropdownMenu(
-                        expanded = menuExpanded,
-                        onDismissRequest = { menuExpanded = false }
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text("Reset DB") },
-                            onClick = {
-                                menuExpanded = false
-                                citiesListViewModel.sendIntent(RandomCitiesIntent.ResetDb)
-                            }
-                        )
-                        // Add more menu items here if needed
-                    }
-                }
-            )
-        }
-    ) { innerPadding ->
-        MainScreen(
-            navController = navController,
-            modifier = Modifier.padding(innerPadding),
-            onBack = {
-                citiesListViewModel.clearSelection()
-                navController.popBackStack()
-            },
-            onTitleChange = { newTitle ->
-                //toolbarTitle = newTitle
-            }
-        )
-    }
-}
 
 
 
