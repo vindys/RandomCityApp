@@ -15,9 +15,9 @@ class RandomCityProducer @Inject constructor(
 ) {
     fun randomCityFlow(): Flow<RandomCity> = flow {
         while (true) {
-            delay(5000)
             val city = generateRandomCity()
             emit(city)
+            delay(5000)
         }
     }
 

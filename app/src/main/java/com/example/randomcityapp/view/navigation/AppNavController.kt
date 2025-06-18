@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.map
 @Composable
 fun NavGraph(
     navController: NavHostController,
+    modifier: Modifier = Modifier,
     twoPane: Boolean,
     onBack: () -> Unit,
     onTitleChange: (String) -> Unit

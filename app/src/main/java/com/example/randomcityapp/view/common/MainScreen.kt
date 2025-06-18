@@ -20,6 +20,7 @@ fun MainScreen(
 
     NavGraph(
         navController = navController,
+        modifier = modifier,
         twoPane = twoPane,
         onBack = onBack,
         onTitleChange = onTitleChange

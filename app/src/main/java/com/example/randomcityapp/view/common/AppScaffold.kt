@@ -1,5 +1,6 @@
 package com.example.randomcityapp.view.common
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -98,7 +99,7 @@ fun AppScaffold(navController: NavHostController) {
     ) { innerPadding ->
         MainScreen(
             navController = navController,
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier.padding(innerPadding).fillMaxSize(),
             onBack = {
                 citiesListViewModel.clearSelection()
                 navController.popBackStack()
